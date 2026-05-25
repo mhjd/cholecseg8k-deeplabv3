@@ -1,4 +1,3 @@
-from PIL import Image
 import numpy as np
 
 LABEL_MAP = {
@@ -19,9 +18,8 @@ LABEL_MAP = {
 IGNORE_INDEX = 255
 
 
-def decode_mask(mask_path):
-    mask = Image.open(mask_path)
-    arr = np.array(mask)
+def decode_mask(mask_array):
+    arr = np.array(mask_array)
     mask_codes = arr[:, :, 0] # identical channels, we just need one
     decoded = np.full_like(mask_codes, fill_value=IGNORE_INDEX)
 

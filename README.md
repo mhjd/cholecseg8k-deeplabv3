@@ -15,4 +15,5 @@ One important detail is that the watershed masks do not store the foreground cla
 
 An issue is the presence of pixels with value `(255, 255, 255)` in almost all watershed masks. The dataset description does not clearly explain the semantic meaning of this value.  Manual inspection suggests that `(255, 255, 255)` pixels in the watershed masks mainly come from the white border around the endoscopic field of view, and more occasionally from boundaries between annotated regions. Because the dataset documentation does not clearly define the meaning of this value, I will treat it as an ignore label during training.
 
-A second edge case is the rare presence of the raw code `(0, 0, 0)` in a small number of watershed masks. This value is not part of the documented class-to-code mapping. Given its extremely low frequency, I will treat it as an ignore label rather than as a semantic class, while acknowledging that its exact meaning is not clearly documented
+A second edge case is the rare presence of the raw code `(0, 0, 0)` in a small number of watershed masks. This value is not part of the documented class-to-code mapping. Given its extremely low frequency, I will treat it as an ignore label rather than as a semantic class, while acknowledging that its exact meaning is not clearly documented.
+
