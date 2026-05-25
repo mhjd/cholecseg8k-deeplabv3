@@ -11,3 +11,5 @@ inspect-mask:
 
 check-dataset-access:
 	$(PYTHON) scripts/check_dataset_access.py
+visualize_sample:
+	$(PYTHON) scripts/visualize_sample.py
