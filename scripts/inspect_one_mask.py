@@ -19,14 +19,14 @@ LABEL_MAP = {
     33 : 11,
     5  : 12,
 }
-IGNORE_INDEX = 255
 
-allowed_codes = set(LABEL_MAP.keys()) | {IGNORE_INDEX}
+IGNORE_INDEX = 255 # not a class, seems to be borders
+
+allowed_codes = set(LABEL_MAP.keys()) | {IGNORE_INDEX, 0} # we add 0, explained in README.md
 
 
-img_path = FOLDER + IMAGE
 
-def decoded_img(img_path):
+def decode_img(img_path):
     img = Image.open(img_path)
     arr = np.array(img)
     mask_codes = arr[:, :, 0] # identical channels, we just need one
@@ -35,6 +35,8 @@ def decoded_img(img_path):
     for raw_value, class_id in LABEL_MAP.items():
         decoded[mask_codes == raw_value] = class_id
     return decoded
+
+img_path = FOLDER + IMAGE
 def find_unknown_codes(img_path):
     img = Image.open(img_path)
     arr = np.array(img)
@@ -51,4 +53,5 @@ for mask_path in mask_paths:
     unknown_codes = find_unknown_codes(mask_path)
     if len(unknown_codes) > 0:
         print(f"Mask path : {mask_path}, unknown_codes : {unknown_codes}")
+        # never reached, because the dataset is as excepted (except 255 and 0)
 print(f" Unknown codes : {find_unknown_codes(img_path)}")
