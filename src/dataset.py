@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import torch
 from pathlib import Path
 from src.masks import decode_mask
 from torch.utils.data import Dataset
@@ -31,6 +32,15 @@ class CholecDataset(Dataset):
         img_arr = np.array(img)
         mask_arr = np.array(mask)
         decoded_mask_arr = decode_mask(mask_arr)
-        return img_arr, decoded_mask_arr
+
+        image_tensor = torch.from_numpy(img_arr)
+        # H, W, C -> C, H, W
+        # permutation because pytorch doesn't store images the same way than numpy
+        image_tensor = image_tensor.permute(2, 0, 1)
+        # normalisation
+        image_tensor = image_tensor.float() / 255.0
+        decoded_mask_tensor = torch.from_numpy(decoded_mask_arr).long() # long/i64 because it's classes
+
+        return image_tensor, decoded_mask_tensor
         
         

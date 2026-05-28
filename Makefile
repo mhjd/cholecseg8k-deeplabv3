@@ -1,5 +1,6 @@
 PYTHONPATH := .
-PYTHON := PYTHONPATH=$(PYTHONPATH) python
+PYTHON_BIN := $(shell test -x .venv/bin/python && echo .venv/bin/python || echo python3)
+PYTHON := PYTHONPATH=$(PYTHONPATH) $(PYTHON_BIN)
 
 .PHONY: test-dataset inspect-mask check-dataset-access
 
