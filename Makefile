@@ -7,6 +7,8 @@ PYTHON := PYTHONPATH=$(PYTHONPATH) $(PYTHON_BIN)
 test-dataset:
 	$(PYTHON) scripts/test_dataset.py
 
+test-dataloader:
+	$(PYTHON) scripts/test_dataloader.py
 inspect-mask:
 	$(PYTHON) scripts/inspect_one_mask.py
 
