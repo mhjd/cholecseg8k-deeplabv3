@@ -19,14 +19,35 @@ print(f"mask unique values :{torch.unique(masks)} ")
 model = deeplabv3_resnet50(weights=None, weights_backbone=None)
 model.classifier[4] = torch.nn.Conv2d(256, NUM_CLASSES, kernel_size=1)
 
+criterion = torch.nn.CrossEntropyLoss(ignore_index=255)
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+
+
 model.eval()
 with torch.no_grad():
     outputs = model(images)
-logits = outputs["out"]
+    logits = outputs["out"]
+    loss_before = criterion(logits, masks)
 print(f"logits dtype: {logits.dtype}")
 print(f"logits shape : {logits.shape}")
+print(f"loss before : {loss_before.item()}")
 
-criterion = torch.nn.CrossEntropyLoss(ignore_index=255)
-loss = criterion(logits, masks)
+# training step
+model.train()
+optimizer.zero_grad()
 
-print(f"loss: {loss.item()}")
+outputs = model(images)
+logits = outputs["out"]
+loss_train = criterion(logits, masks)
+loss_train.backward()
+optimizer.step()
+print(f"training loss : {loss_train.item()}")
+
+# evaluation
+model.eval()
+with torch.no_grad():
+    outputs = model(images)
+    logits = outputs["out"]
+    loss_after = criterion(logits, masks)
+print(f"loss after: {loss_after.item()}")
+
