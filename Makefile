@@ -9,6 +9,10 @@ test-dataset:
 
 smoke-train:
 	$(PYTHON) scripts/smoke_train.py
+
+test-metrics:
+	$(PYTHON) scripts/test_metrics.py
+
 inspect-mask:
 	$(PYTHON) scripts/inspect_one_mask.py
 

@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 from torchvision.models.segmentation import deeplabv3_resnet50
 from src.dataset import CholecDataset
+from src.metrics import dice, foreground_iou, mean_iou, per_class_iou
 
 NUM_CLASSES = 13
 
@@ -33,11 +34,32 @@ print(f"logits dtype: {logits.dtype}")
 print(f"logits shape : {logits.shape}")
 print(f"loss before : {loss_before.item()}")
 
-model.train()
-# overfit loop
+
+
+def evaluate_one_epoch(model, data_loader):
+    model.eval()
+    miou_acc = 0.0
+    foreground_iou_acc = 0.0
+    dice_acc = 0.0
+    with torch.no_grad():
+        for images, masks in data_loader:
+            outputs = model(images)
+            preds = outputs["out"].argmax(dim=1)
+            miou_acc += mean_iou(preds, masks, NUM_CLASSES).item()
+            foreground_iou_acc += foreground_iou(preds, masks, NUM_CLASSES).item()
+            dice_acc += torch.nanmean(dice(preds, masks, NUM_CLASSES)).item()
+    n_batches = len(data_loader)
+    print("===== Metrics =====")
+    print(f"mIoU: {miou_acc / n_batches}")
+    print(f"foreground IoU: {foreground_iou_acc / n_batches}")
+    print(f"Dice: {dice_acc / n_batches}")
+    print("===================")
+
+evaluate_one_epoch(model, data_loader)
+# overfit
 for i in range(10):
     # training loop
-    
+    model.train()
     loss_acc = 0.0
     for images, masks in data_loader:
         # training step
@@ -45,9 +67,12 @@ for i in range(10):
         
         outputs = model(images)
         logits = outputs["out"]
+        preds = logits.argmax(dim=1)
         loss_train = criterion(logits, masks)
         loss_train.backward()
         optimizer.step()
         loss_acc += loss_train.item()
     loss = loss_acc / len(data_loader)
     print(f"average training loss of epoch {i + 1}: {loss}")
+    
+evaluate_one_epoch(model, data_loader)
