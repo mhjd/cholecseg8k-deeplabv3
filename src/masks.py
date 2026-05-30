@@ -1,19 +1,19 @@
 import numpy as np
 
 LABEL_MAP = {
-    50 : 0,
-    11 : 1,
-    21 : 2,
-    13 : 3,
-    12 : 4,
-    31 : 5,
-    23 : 6,
-    24 : 7,
-    25 : 8,
-    32 : 9,
-    22 : 10,
-    33 : 11,
-    5  : 12,
+    50 : 0, # Black background
+    11 : 1, # Abdonimal wall
+    21 : 2, # Liver
+    13 : 3, # Gastrointestinal tract
+    12 : 4, # Fat
+    31 : 5, # Grasper
+    23 : 6, # Connective tissue
+    24 : 7, # Blood
+    25 : 8, # Cystic duct
+    32 : 9, # L-hook Electrocautery
+    22 : 10, # Gallbladder
+    33 : 11, # Hepatic vein
+    5  : 12, # Liver ligament
 }
 IGNORE_INDEX = 255
 
