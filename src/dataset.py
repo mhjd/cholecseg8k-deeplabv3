@@ -19,15 +19,20 @@ def collect_pair_image_mask():
     return pairs_image_mask
 
 class CholecDataset(Dataset):
-    def __init__(self):
+    # PIL uses (width, height)
+    def __init__(self, image_size=None):
         self.pair_image_mask = collect_pair_image_mask()
+        self.image_size = image_size
 
     def __len__(self):
         return len(self.pair_image_mask)
 
     def __getitem__(self, idx):
-        img = Image.open(self.pair_image_mask[idx][0])
-        mask = Image.open(self.pair_image_mask[idx][1])
+        img = Image.open(self.pair_image_mask[idx][0]).convert("RGB")
+        mask = Image.open(self.pair_image_mask[idx][1]).convert("RGB")
+        if self.image_size:
+            img = img.resize(self.image_size, resample=Image.Resampling.BILINEAR)
+            mask = mask.resize(self.image_size, resample=Image.Resampling.NEAREST)
 
         img_arr = np.array(img)
         mask_arr = np.array(mask)

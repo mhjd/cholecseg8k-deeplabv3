@@ -6,7 +6,7 @@ from src.metrics import dice, foreground_iou, mean_iou, per_class_iou
 
 NUM_CLASSES = 13
 
-dataset = CholecDataset()
+dataset = CholecDataset(image_size=(427, 240))
 subset_dataset = Subset(dataset, range(6))
 
 data_loader = DataLoader(subset_dataset, batch_size=2, shuffle=False)
