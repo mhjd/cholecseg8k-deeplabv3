@@ -10,6 +10,9 @@ test-dataset:
 smoke-train:
 	$(PYTHON) scripts/smoke_train.py
 
+train-baseline:
+	$(PYTHON) scripts/train_baseline.py
+
 test-metrics:
 	$(PYTHON) scripts/test_metrics.py
 
