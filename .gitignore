@@ -1,2 +1,9 @@
 dataset/*
 !dataset/.gitkeep
+
+.venv/
+outputs/
+__pycache__/
+*.pyc
+.DS_Store
+eval_deeplabv3_result.txt
