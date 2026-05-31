@@ -1,41 +1,39 @@
-import numpy as np
-from PIL import Image
+import torch
 from src.dataset import CholecDataset
+from src.visualization import save_prediction_visualization
+from torchvision.models.segmentation import deeplabv3_resnet50
 
-dataset = CholecDataset()
 
-MAPPING_CODE_TO_COLOR = {
-    0:  (0, 114, 178),    # blue
-    1:  (213, 94, 0),     # reddish orange
-    2:  (0, 158, 115),    # green
-    3:  (204, 121, 167),  # pink
-    4:  (230, 159, 0),    # orange
-    5:  (86, 180, 233),   # light blue
-    6:  (128, 0, 128),    # purple
-    7:  (128, 64, 0),     # brown
-    8:  (240, 228, 66),   # yellow
-    9:  (0, 139, 139),    # dark blue
-    10: (220, 20, 60),    # red
-    11: (107, 142, 35),   # olive green
-    12: (70, 70, 70),     # gray
-    255: (255, 255, 255)  # white
-}
+NUM_CLASSES = 13
+TEST_VIDEO_IDS = [52, 55]
 
-output_dir = "outputs/"
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
-def create_visualization(idx, output_image_name):
-    image = dataset[idx][0]
-    mask = dataset[idx][1]
+model = deeplabv3_resnet50(weights=None, weights_backbone=None)
+model.classifier[4] = torch.nn.Conv2d(256, NUM_CLASSES, kernel_size=1)
 
-    visualized_mask = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
-    for class_id, color in MAPPING_CODE_TO_COLOR.items():
-        visualized_mask[class_id == mask] = color
+state_dict = torch.load("outputs/best_deeplabv3_resnet50.pth", map_location=device)
+model.load_state_dict(state_dict)
+model.to(device)
+model.eval()
+
+
+
+dataset_52 = CholecDataset(image_size=(427, 240), video_ids=[52])
+dataset_55 = CholecDataset(image_size=(427, 240), video_ids=[55])
+
+def visualize_one_dataset_elem(dataset, img_name, image_index_list):
+    
+    for image_index in image_index_list:
+        image, mask = dataset[image_index]
+        image_batch = image.unsqueeze(0).to(device)
         
-    mask_img = Image.fromarray(visualized_mask)
-    mask_img.save(output_dir + output_image_name + "_mask.png")
+        with torch.no_grad():
+            output = model(image_batch)
+            pred_mask = output["out"].argmax(dim=1)
+            pred_mask = pred_mask[0]
 
-    saving_image = Image.fromarray(image)
-    saving_image.save(output_dir + output_image_name + ".png")
+        save_prediction_visualization(image, mask, pred_mask, img_name + "_" + str(image_index))
 
-
-create_visualization(1, "first_image")
+visualize_one_dataset_elem(dataset_52, "video_52", [0, 100, 400, 700])
+visualize_one_dataset_elem(dataset_55, "video_55", [0, 100, 200])

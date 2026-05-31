@@ -17,3 +17,16 @@ An issue is the presence of pixels with value `(255, 255, 255)` in almost all wa
 
 A second edge case is the rare presence of the raw code `(0, 0, 0)` in a small number of watershed masks. This value is not part of the documented class-to-code mapping. Given its extremely low frequency, I will treat it as an ignore label rather than as a semantic class, while acknowledging that its exact meaning is not clearly documented.
 
+# Qualitative Results
+
+The following examples are taken from the held-out test videos. Each panel shows, from left to right: the input image, the ground-truth mask, and the DeepLabV3 prediction.
+
+These examples show how the model predictions compare visually with the ground-truth masks.
+
+![Prediction example 1](images/video_52_100_panel.png)
+
+![Prediction example 2](images/video_52_700_panel.png)
+
+![Prediction example 3](images/video_55_0_panel.png)
+
+![Prediction example 4](images/video_55_100_panel.png)
