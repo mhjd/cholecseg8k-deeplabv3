@@ -1,5 +1,6 @@
 import torch
 from src.dataset import CholecDataset
+from src.device import get_device
 from src.visualization import save_prediction_visualization
 from torchvision.models.segmentation import deeplabv3_resnet50
 
@@ -7,7 +8,7 @@ from torchvision.models.segmentation import deeplabv3_resnet50
 NUM_CLASSES = 13
 TEST_VIDEO_IDS = [52, 55]
 
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+device = get_device()
 
 model = deeplabv3_resnet50(weights=None, weights_backbone=None)
 model.classifier[4] = torch.nn.Conv2d(256, NUM_CLASSES, kernel_size=1)

@@ -5,6 +5,7 @@ from pathlib import Path
 from torch.utils.data import DataLoader
 from torchvision.models.segmentation import deeplabv3_resnet50
 from src.dataset import CholecDataset
+from src.device import get_device
 from src.metrics import dice, foreground_iou, mean_iou, per_class_iou
 
 NUM_CLASSES = 13
@@ -36,7 +37,7 @@ val_data_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 model = deeplabv3_resnet50(weights=None, weights_backbone=None)
 model.classifier[4] = torch.nn.Conv2d(256, NUM_CLASSES, kernel_size=1)
 
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+device = get_device()
 model.to(device)
 
 criterion = torch.nn.CrossEntropyLoss(ignore_index=255)
@@ -146,4 +147,3 @@ def train_n_epoch(model, data_loader, n, val_data_loader):
     
 
 train_n_epoch(model, train_data_loader, NUM_EPOCH, val_data_loader)
-
