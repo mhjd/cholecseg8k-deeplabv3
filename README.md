@@ -2,6 +2,10 @@
 
 This project studies 13-class semantic segmentation on CholecSeg8k using DeepLabV3-ResNet50. The goal is to build a clear baseline and to explain the dataset and evaluation choices behind the results.
 
+![Example prediction](images/video_52_100_panel.png)
+
+Example prediction on a test video. From left to right: input image, ground-truth mask, and DeepLabV3 prediction.
+
 ## Dataset
 
 CholecSeg8k is a semantic segmentation dataset built from annotated frames of laparoscopic cholecystectomy videos. The local copy used here contains 8080 annotated images from 17 videos.
