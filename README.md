@@ -12,58 +12,7 @@ CholecSeg8k is a semantic segmentation dataset built from annotated frames of la
 
 Each sample includes an endoscopic RGB frame and several associated masks. In this project, I use the watershed mask as the training target, because it provides class-level labels that can be decoded into 13 semantic classes.
 
-Download CholecSeg8k manually from [Hugging Face](https://huggingface.co/datasets/minwoosun/CholecSeg8k/blob/main/data/CholecSeg8k.zip) and place the unzipped dataset in the `dataset/` folder.
-
-## How to Run
-
-Create a Python environment and install the dependencies:
-
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-```
-
-Download CholecSeg8k manually from [Hugging Face](https://huggingface.co/datasets/minwoosun/CholecSeg8k/blob/main/data/CholecSeg8k.zip), unzip it, and place it so that this path exists:
-
-```text
-dataset/CholecSeg8k/
-```
-
-Create the output folder:
-
-```bash
-mkdir -p outputs
-```
-
-Check that the dataset can be loaded:
-
-```bash
-make test-dataset
-```
-
-Train the DeepLabV3 baseline. This writes logs and the best checkpoint to `outputs/`:
-
-```bash
-make train-baseline
-```
-
-If you do not want to retrain the model, download the checkpoint from the [DeepLabV3 baseline checkpoint release](https://github.com/mhjd/cholecseg8k-deeplabv3/releases/tag/deeplabv3-baseline-checkpoint) and place it at:
-
-```text
-outputs/best_deeplabv3_resnet50.pth
-```
-
-Evaluate the saved checkpoint on the test split:
-
-```bash
-make eval-finetuned
-```
-
-Generate prediction examples from the saved checkpoint:
-
-```bash
-make visualize_sample
-```
+The dataset was downloaded from the [CholecSeg8k Hugging Face mirror](https://huggingface.co/datasets/minwoosun/CholecSeg8k/blob/main/data/CholecSeg8k.zip).
 
 ## Mask Encoding Notes
 
@@ -133,3 +82,39 @@ The main limitation of this baseline is the small experimental budget. Training 
 The video-level split reduces the risk of evaluating on frames that are too similar to the training data. However, the number of annotated frames varies strongly between videos, which makes the split harder to balance. A more complete evaluation could compare several video-level splits.
 
 The aggregate metrics give a useful overview, but they do not show which classes are well segmented and which ones are confused. A per-class analysis would be the most useful next step, especially together with visual examples of typical errors.
+
+## How to Run
+
+Create a Python environment and install the dependencies:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Download CholecSeg8k manually from [Hugging Face](https://huggingface.co/datasets/minwoosun/CholecSeg8k/blob/main/data/CholecSeg8k.zip), unzip it, and place it at:
+
+```text
+dataset/CholecSeg8k/
+```
+
+Create the output folder:
+
+```bash
+mkdir -p outputs
+```
+
+Main commands:
+
+| Command | Description |
+|---|---|
+| `make test-dataset` | Check that the dataset can be loaded. |
+| `make train-baseline` | Train the baseline and save the best checkpoint to `outputs/`. |
+| `make eval-finetuned` | Evaluate the saved checkpoint on the test split. |
+| `make visualize_sample` | Generate prediction examples from the saved checkpoint. |
+
+To skip training, download the checkpoint from the [DeepLabV3 baseline checkpoint release](https://github.com/mhjd/cholecseg8k-deeplabv3/releases/tag/deeplabv3-baseline-checkpoint) and place it at:
+
+```text
+outputs/best_deeplabv3_resnet50.pth
+```
