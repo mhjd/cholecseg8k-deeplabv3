@@ -1,5 +1,7 @@
 import torch
 import time
+import logging
+from pathlib import Path
 from torch.utils.data import DataLoader
 from torchvision.models.segmentation import deeplabv3_resnet50
 from src.dataset import CholecDataset
@@ -10,6 +12,20 @@ RESOLUTION = (427, 240)
 TRAIN_VIDEO_IDS = [1, 9, 12, 17, 18, 20, 24, 25, 26, 27, 28, 35, 37]
 VAL_VIDEO_IDS = [43, 48]
 BATCH_SIZE = 4
+NUM_EPOCH = 3
+
+Path("outputs").mkdir(exist_ok=True)
+
+logging.basicConfig(
+    filename="outputs/train_baseline.log",
+    level=logging.INFO,
+    format="%(asctime)s | %(message)s",
+)
+
+def log(message):
+    print(message)
+    logging.info(message)
+log("===== New training run =====")
 
 train_dataset = CholecDataset(image_size=RESOLUTION, video_ids=TRAIN_VIDEO_IDS)
 train_data_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
@@ -25,6 +41,15 @@ model.to(device)
 
 criterion = torch.nn.CrossEntropyLoss(ignore_index=255)
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+log(f"Resolution: {RESOLUTION}")
+log(f"Batch size: {BATCH_SIZE}")
+log(f"Num epoch : {NUM_EPOCH}")
+log(f"Train videos: {TRAIN_VIDEO_IDS}")
+log(f"Val videos: {VAL_VIDEO_IDS}")
+log(f"Train images: {len(train_dataset)}")
+log(f"Val images: {len(val_dataset)}")
+log(f"Device: {device}")
+
 
 def indent(n):
     return n*"      "
@@ -43,14 +68,20 @@ def evaluate_one_epoch(model, data_loader):
             foreground_iou_acc += foreground_iou(preds, masks, NUM_CLASSES).item()
             dice_acc += torch.nanmean(dice(preds, masks, NUM_CLASSES)).item()
     n_batches = len(data_loader)
-    print(f"{indent(2)}===== Metrics =====")
-    print(f"{indent(2)}mIoU: {miou_acc / n_batches}")
-    print(f"{indent(2)}foreground IoU: {foreground_iou_acc / n_batches}")
-    print(f"{indent(2)}Dice: {dice_acc / n_batches}")
-    print(f"{indent(2)}===================")
+
+    avg_miou = miou_acc / n_batches
+    avg_fg = foreground_iou_acc / n_batches
+    avg_dice = dice_acc / n_batches
+    log(f"{indent(2)}===== Metrics =====")
+    log(f"{indent(2)}mIoU: {avg_miou}")
+    log(f"{indent(2)}foreground IoU: {avg_fg}")
+    log(f"{indent(2)}Dice: {avg_dice}")
+    log(f"{indent(2)}===================")
+    
+    return avg_miou
 
 
-def print_epoch_progres(epoch_start, batch_start, batch_end, batch_done, n_batches):
+def print_epoch_progress(epoch_start, batch_start, batch_end, batch_done, n_batches):
         epoch_percentage_progress = batch_done / n_batches * 100
         batch_time_elapsed = batch_end - batch_start
         epoch_time_elapsed = batch_end - epoch_start
@@ -94,18 +125,25 @@ def train_one_epoch(model, data_loader):
         
         batch_end = time.perf_counter()
         batch_done = idx + 1
-        print_epoch_progres(epoch_start, batch_start, batch_end, batch_done, n_batches)
+        print_epoch_progress(epoch_start, batch_start, batch_end, batch_done, n_batches)
     loss = loss_acc / len(data_loader)
-    print(f"{indent(1)}average loss : {loss}")
+    log(f"{indent(1)}average loss : {loss}")
     return model
 def train_n_epoch(model, data_loader, n, val_data_loader):
+    best_miou = 0
     for i in range(n):
-        print(f"===== Epoch {i + 1} =====")
+        log(f"===== Epoch {i + 1} =====")
         model = train_one_epoch(model, data_loader)
-        evaluate_one_epoch(model, val_data_loader)
+        miou = evaluate_one_epoch(model, val_data_loader)
+        if miou > best_miou:
+            best_miou = miou
+            torch.save(model.state_dict(), "outputs/best_deeplabv3_resnet50.pth")
+            log(f"best mIoU : {best_miou}")
+        else:
+            log("Validation mIoU did not improve, keeping previous best checkpoint")
         print("=====================")
     return model
     
 
-train_n_epoch(model, train_data_loader, 1, val_data_loader)
+train_n_epoch(model, train_data_loader, NUM_EPOCH, val_data_loader)
 
