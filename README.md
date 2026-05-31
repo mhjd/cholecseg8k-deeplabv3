@@ -10,6 +10,51 @@ Each sample includes an endoscopic RGB frame and several associated masks. In th
 
 Download CholecSeg8k manually from [Hugging Face](https://huggingface.co/datasets/minwoosun/CholecSeg8k/blob/main/data/CholecSeg8k.zip) and place the unzipped dataset in the `dataset/` folder.
 
+## How to Run
+
+Create a Python environment and install the dependencies:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Download CholecSeg8k manually from [Hugging Face](https://huggingface.co/datasets/minwoosun/CholecSeg8k/blob/main/data/CholecSeg8k.zip), unzip it, and place it so that this path exists:
+
+```text
+dataset/CholecSeg8k/
+```
+
+Create the output folder:
+
+```bash
+mkdir -p outputs
+```
+
+Check that the dataset can be loaded:
+
+```bash
+make test-dataset
+```
+
+Train the DeepLabV3 baseline. This writes logs and the best checkpoint to `outputs/`:
+
+```bash
+make train-baseline
+```
+
+Evaluate the saved checkpoint on the test split:
+
+```bash
+make eval-finetuned
+```
+
+Generate prediction examples from the saved checkpoint:
+
+```bash
+make visualize_sample
+```
+
 ## Mask Encoding Notes
 
 For each image, the dataset provides a color mask for visualization and a class mask, called the watershed mask, intended for programmatic use.
