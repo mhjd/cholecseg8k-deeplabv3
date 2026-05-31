@@ -43,6 +43,12 @@ Train the DeepLabV3 baseline. This writes logs and the best checkpoint to `outpu
 make train-baseline
 ```
 
+If you do not want to retrain the model, download the checkpoint from the [DeepLabV3 baseline checkpoint release](https://github.com/mhjd/cholecseg8k-deeplabv3/releases/tag/deeplabv3-baseline-checkpoint) and place it at:
+
+```text
+outputs/best_deeplabv3_resnet50.pth
+```
+
 Evaluate the saved checkpoint on the test split:
 
 ```bash

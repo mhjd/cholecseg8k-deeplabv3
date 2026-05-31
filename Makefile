@@ -2,7 +2,7 @@ PYTHONPATH := .
 PYTHON_BIN := $(shell test -x .venv/bin/python && echo .venv/bin/python || echo python3)
 PYTHON := PYTHONPATH=$(PYTHONPATH) $(PYTHON_BIN)
 
-.PHONY: test-dataset inspect-mask check-dataset-access smoke-train train-baseline test-metrics eval-finetuned
+.PHONY: test-dataset inspect-mask check-dataset-access smoke-train train-baseline test-metrics eval-finetuned visualize_sample
 
 test-dataset:
 	$(PYTHON) scripts/test_dataset.py
